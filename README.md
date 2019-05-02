@@ -1,3 +1,4 @@
+# Environment
 
 ## Set up devops environment
 
@@ -67,11 +68,28 @@ Create symlink
 
 ## Generate JHipster stand-alone web application
 
-Append custom DNS references to your local hosts file (/etc/hosts)
+https://www.jhipster.tech/2019/04/04/jhipster-release-6.0.0-beta.0.html
 
+Generate webapp:
 
+    jhipster
+
+Generate helm chart:
+
+    jhipster kubernetes-helm
+
+## Build Docker image & push
+
+Build:
+
+    ./mvnw -Pprod verify jib:dockerBuild
+
+Tag & push:
+
+    docker login -u "studiofrancium" -p "Z8n78Lk5QNC8df" docker.io
+    docker image tag latest studiofrancium/acme-web
+    docker push studiofrancium/acme-web:latest
     
-
 
 ## Working with minikube
 ### Setting up the environment
@@ -94,13 +112,13 @@ Append Minikube home to .acmerc
 
 then
     
+    source /home/acme/.bash_profile
     ln -s $LUM_MINIKUBE_HOME /home/acme/.minikube
     
 Append minikube host to /etc/hosts file
 
     192.168.99.100  kubernetes.default
-    192.168.99.100  m1kube-idm.luminorgroup.com
-    192.168.99.100  m1kube-am.luminorgroup.com
+    192.168.99.100	m1kube-acme.example.com
 
 Link local Kube config to Minikube cluster
 
@@ -149,7 +167,56 @@ Deleting minikube cluster. Type in PowerShell:
 
 *To completely remove all configuration you need  to delete rm -Rf ~/.kube/ ~/.minikube/ ~/.helm/
 
-### Troubleshooting
+# Using the /opt/acmeops/**/*.sh scripts
+
+## Helm install
+
+### Deploy ACME to a K8s cluster
+In order to deploy ACME you need to have set up access to a K8S cluster such as Minikube. 
+
+Test your access to m1kube:
+
+    kubectx minikube
+
+[Optional] Deploy Ingress controller (not required for minikube)
+
+    /opt/acmekube/bin/ci/ingress.sh
+
+Create new namespace for acme
+
+    /opt/acmekube/bin/ns/ns-create.sh
+
+Switch to namespace:
+
+    /opt/acmekube/bin/ctx/m1kube-acme.sh
+
+Deploy helm chart for PostgreSQL
+
+    /opt/forgekube/bin/ci/postgresql.sh
+
+Deploy helm chart for ACME
+
+    /opt/acmekube/bin/ci/acme.sh
+
+Then go to: [https://m1kube-acme.example.com/]
+
+Tail ACME
+
+    /opt/acmekube/bin/tail/openam.sh
+
+### Debug ACME pod
+
+    /opt/acmekube/bin/port-forward/acme/5005.sh
+
+Then configure & run debug config in IntelliJ against localhost:5005 port.
+
+### Remove pods
+
+    helm delete --purge acme
+    helm delete --purge postgresql
+
+
+# Troubleshooting
 
 Minikube helpers
 
