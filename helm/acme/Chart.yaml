@@ -1,0 +1,17 @@
+name: acme
+version: 6.0.0-beta.0
+appVersion: 1.0.0
+description: acme is a JHipster based monolith application
+icon: https://www.jhipster.tech/images/logo/logo-jhipster-drink-coffee.svg
+keywords:
+- spring
+- angular
+- react
+- JHipster
+- acme
+home: https://www.jhipster.tech/
+sources:
+- https://github.com/jhipster/generator-jhipster.git
+maintainers:
+- name: Team JHipster
+  email:

@@ -1,0 +1,27 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: acme
+  namespace: acme-namespace
+  labels:
+    app: acme-app
+    vendor: example
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  tls:
+  - hosts:
+    - {{ template "externalFQDN" . }}
+    secretName: {{ template "externalFQDN" . }}
+  rules:
+    - host: {{ template "externalFQDN" . }}
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: acme
+            servicePort: 8080
+{{- end -}}

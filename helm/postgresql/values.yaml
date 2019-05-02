@@ -1,0 +1,4 @@
+postgresql:
+  enabled: true
+  postgresqlUsername: acme
+  postgresqlDatabase: acme
