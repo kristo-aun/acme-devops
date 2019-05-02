@@ -23,6 +23,13 @@ Start "Bash on Ubuntu on Windows" from Start menu. Ubuntu installation should fi
 - Create a new user/pass - acme:changeit
 - Success - acme@LUMEE-NB49:~$
 
+
+Alternatively, create new sudo user:
+
+    adduser acme
+    usermod -aG sudo acme
+    su - acme 
+
 ### Configure your Ubuntu installation
 
 [Optional] If ~/.bash_profile does not exist
@@ -38,7 +45,12 @@ Append to ~/.bashrc
     if [ -f ~/.acmerc ]; then
         . ~/.acmerc
     fi
-    
+
+Test your profile
+
+    source ~/.bash_profile
+    echo $LUM_USERNAME
+
 Clone binaries' repository
     
     sudo git clone https://github.com/studiofrancium/k8s-linux-amd64-bin.git /opt/k8s-linux-amd64-bin
@@ -46,35 +58,42 @@ Clone binaries' repository
 Create symlink    
     
     sudo ln -s /opt/k8s-linux-amd64-bin /opt/k8s
-    
+
 Append to ~/.bash_profile
 
     export KUBERNETES_HOME="/opt/k8s"
     PATH=$KUBERNETES_HOME/bin:$PATH
- 
-### Self-signed keystore & truststore
 
-    git clone https://github.com/studiofrancium/franciumca.git /opt/franciumca    
+Test your K8s binaries
 
-Create symlink    
-    
-    sudo ln -s /opt/franciumca/tls/keystore /opt/keystore
+    source ~/.bash_profile
+    minikube version
 
 ### Acme devops scripts
 
-Create symlink    
+Option 1. Clone devops repository
+    
+    sudo git clone https://github.com/studiofrancium/acme-devops.git /opt/acme-devops
+    sudo ln -s /opt/acme-devops/acmekube /opt/acmekube
+
+Option 2. You can link to a folder in Windows
     
     sudo ln -s /mnt/c/icecode/techex/acme-devops/acmekube /opt/acmekube
 
+Append aliases to ~/.bash_aliases
+
+    alias kubestatus="/opt/acmekube/bin/kubestatus.sh"
+
 ## Generate JHipster stand-alone web application
 
-https://www.jhipster.tech/2019/04/04/jhipster-release-6.0.0-beta.0.html
+Install JHipster 6.* from https://www.jhipster.tech/2019/04/04/jhipster-release-6.0.0-beta.0.html
 
-Generate webapp:
+Generate webapp (as acme user):
 
+    mkdir ~/acme && cd ~/acme
     jhipster
 
-Generate helm chart:
+[Optional] Generate helm chart:
 
     jhipster kubernetes-helm
 
@@ -86,7 +105,7 @@ Build:
 
 Tag & push:
 
-    docker login -u "studiofrancium" -p "Z8n78Lk5QNC8df" docker.io
+    docker login -u "$USER" -p "$PASS" docker.io
     docker image tag latest studiofrancium/acme-web
     docker push studiofrancium/acme-web:latest
     
@@ -133,6 +152,8 @@ Link local Kube config to Minikube cluster
      --client-key=$LUM_MINIKUBE_HOME/client.key
      
     kubectl config set-context minikube --cluster=minikube --user=minikube
+
+Test your access to Minikube cluster
      
     kubectx minikube
 
@@ -158,17 +179,6 @@ Go to minikube dashboard and wait for pods to finish startup. Type in PowerShell
 
 [http://minikube.local:30000/]
 
-### Stop & delete
-Stopping minikube cluster. Type in PowerShell:
-
-    minikube stop
-
-Deleting minikube cluster. Type in PowerShell:
-
-    minikube delete
-
-*To completely remove all configuration you need  to delete rm -Rf ~/.kube/ ~/.minikube/ ~/.helm/
-
 # Using the /opt/acmeops/**/*.sh scripts
 
 ## Helm install
@@ -188,23 +198,35 @@ Create new namespace for acme
 
     /opt/acmekube/bin/ns/ns-create.sh
 
-Switch to namespace:
+Switch to namespace
 
     /opt/acmekube/bin/ctx/m1kube-acme.sh
 
+Helm init
+    
+    helm init
+
 Deploy helm chart for PostgreSQL
 
-    /opt/forgekube/bin/ci/postgresql.sh
+    /opt/acmekube/bin/ci/postgresql.sh
 
 Deploy helm chart for ACME
 
     /opt/acmekube/bin/ci/acme.sh
 
-Then go to: [https://m1kube-acme.example.com/]
-
 Tail ACME
 
-    /opt/acmekube/bin/tail/openam.sh
+    /opt/acmekube/bin/tail/acme.sh
+
+Wait until you see in logs
+
+    Application 'acme' is running! Access URLs:
+        Local:          http://localhost:8080/
+        External:       http://172.17.0.9:8080/
+        Profile(s):     [prod]
+
+Then go to: [https://m1kube-acme.example.com]
+Log in with admin:admin
 
 ### Debug ACME pod
 
@@ -212,11 +234,23 @@ Tail ACME
 
 Then configure & run debug config in IntelliJ against localhost:5005 port.
 
-### Remove pods
+# Stop & delete
+
+## Remove pods
 
     helm delete --purge acme
     helm delete --purge postgresql
 
+## Minikube
+Stopping minikube cluster. Type in PowerShell:
+
+    minikube stop
+
+Deleting minikube cluster. Type in PowerShell:
+
+    minikube delete
+
+*To completely remove all configuration you need  to delete rm -Rf ~/.kube/ ~/.minikube/ ~/.helm/
 
 # Troubleshooting
 
