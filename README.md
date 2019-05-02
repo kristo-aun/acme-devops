@@ -98,6 +98,8 @@ Tag & push:
 1. Install Virtualbox for Windows 10 [https://www.virtualbox.org/wiki/Downloads] 
 2. Install Minikube.exe from GitHub releases [https://github.com/kubernetes/minikube/releases]
 
+More info from https://kubernetes.io/docs/tasks/tools/install-minikube/#install-minikube
+
 #### Start Minikube cluster in WSL
 Start minikube. Type in PowerShell:
 
